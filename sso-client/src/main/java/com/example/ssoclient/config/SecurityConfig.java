@@ -1,5 +1,6 @@
 package com.example.ssoclient.config;
 
+import com.example.ssoclient.security.RestAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -38,6 +39,11 @@ public class SecurityConfig {
                         // 把 Keycloak 的 Realm Role 转成 ROLE_ 前缀的 Spring Authority
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userAuthoritiesMapper(userAuthoritiesMapper))
+                )
+                // 已登录但权限不足：直接返回 403 JSON。
+                // 不覆盖 authenticationEntryPoint，否则会破坏 oauth2Login 的跳转登录
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(new RestAccessDeniedHandler())
                 )
                 // 登出时先清理本地 Session，再重定向到 Keycloak 的 end_session_endpoint
                 .logout(logout -> logout
