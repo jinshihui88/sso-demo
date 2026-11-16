@@ -1,0 +1,17 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: api-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # 只写 issuer-uri，Spring Security 会自动拉取 Discovery 元数据与 JWKS 公钥，
+          # 用授权服务器的公钥验证签名，并校验 iss、exp、nbf 等标准声明
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/demo}
+
+logging:
+  level:
+    org.springframework.security: INFO

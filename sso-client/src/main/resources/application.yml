@@ -1,0 +1,44 @@
+server:
+  # 同一份构建产物作为 App-A(8081) / App-B(8082) 启动，端口由环境变量决定
+  port: ${SERVER_PORT:8081}
+  servlet:
+    session:
+      cookie:
+        # 关键：同一台机器上多个应用都是 localhost 时，浏览器 Cookie 不区分端口，
+        # 都用默认 JSESSIONID 会互相覆盖，导致反复登录。这里给每个应用独立的 Cookie 名。
+        name: ${SESSION_COOKIE_NAME:APP_A_SESSION}
+        http-only: true
+        # 本地 HTTP 实验用 false；生产必须 HTTPS + true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: lax
+
+spring:
+  application:
+    name: springboot-sso-client
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: ${OIDC_CLIENT_ID:app-a}
+            client-secret: ${OIDC_CLIENT_SECRET:app-a-secret-2026}
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            # {baseUrl} 由请求自动推导，代理场景要保证 forwarded headers 正确
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          keycloak:
+            # 必须与 Realm 的 Discovery issuer 完全一致，否则启动时报 issuer 不匹配
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/demo}
+
+app:
+  instance-name: ${APP_INSTANCE_NAME:App-A}
+
+logging:
+  level:
+    org.springframework.security: INFO

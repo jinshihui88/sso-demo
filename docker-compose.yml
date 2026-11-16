@@ -1,0 +1,20 @@
+# Keycloak 统一身份认证中心（仅本地开发使用）
+# 启动：docker compose up -d
+# 管理台：http://localhost:8180  （账号 admin / ChangeMe_Admin_123!）
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    command:
+      - start-dev
+      - --http-port=8080
+      # 首次启动自动导入 ./keycloak/realm-demo.json，省去手工建 Realm/用户/客户端
+      - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ChangeMe_Admin_123!
+    ports:
+      # 只绑定回环地址，不把管理端口暴露到局域网/公网
+      - "127.0.0.1:8180:8080"
+    volumes:
+      - ./keycloak/realm-demo.json:/opt/keycloak/data/import/realm-demo.json:ro
+    restart: unless-stopped

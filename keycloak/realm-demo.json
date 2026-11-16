@@ -1,0 +1,169 @@
+{
+  "realm": "demo",
+  "enabled": true,
+  "displayName": "SSO Demo Realm",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+      {
+        "name": "USER",
+        "description": "普通业务用户",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "ADMIN",
+        "description": "管理角色",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "demo-user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "User",
+      "email": "demo-user@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test_User_123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER"],
+      "requiredActions": []
+    },
+    {
+      "username": "admin-user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin-user@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Test_Admin_123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER", "ADMIN"],
+      "requiredActions": []
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "app-a",
+      "name": "App A - Spring Boot OIDC Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "app-a-secret-2026",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:8081",
+      "baseUrl": "/",
+      "redirectUris": ["http://localhost:8081/login/oauth2/code/keycloak"],
+      "webOrigins": ["http://localhost:8081"],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8081/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles-to-id-token",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "usermodel.realmRoleMapping.rolePrefix": ""
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "app-b",
+      "name": "App B - Spring Boot OIDC Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "app-b-secret-2026",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:8082",
+      "baseUrl": "/",
+      "redirectUris": ["http://localhost:8082/login/oauth2/code/keycloak"],
+      "webOrigins": ["http://localhost:8082"],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:8082/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles-to-id-token",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "usermodel.realmRoleMapping.rolePrefix": ""
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "api-cli",
+      "name": "API CLI - password grant for local testing only",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "api-cli-secret-2026",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "realm-roles-to-access-token",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "usermodel.realmRoleMapping.rolePrefix": ""
+          }
+        }
+      ]
+    }
+  ]
+}
